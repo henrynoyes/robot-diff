@@ -1,0 +1,59 @@
+#usda 1.0
+(
+    defaultPrim = "visuals"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "visuals" (
+    prepend apiSchemas = ["IsaacRobotAPI"]
+)
+{
+    prepend rel isaac:physics:robotLinks = [
+        </visuals/mesh_link>,
+        </visuals/no_visuals_link>,
+    ]
+
+    def Xform "mesh_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+    )
+    {
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+
+        def Xform "visuals"
+        {
+            def Xform "mesh_visual"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (1, 1, 1)
+                float3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Mesh "mesh"
+                {
+                }
+            }
+        }
+    }
+
+    def Xform "no_visuals_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+    )
+    {
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+    }
+}

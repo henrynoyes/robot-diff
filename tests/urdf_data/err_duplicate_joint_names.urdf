@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<robot name="duplicate_joints">
+  <link name="base_link"/>
+  <link name="link1"/>
+  <link name="link2"/>
+
+  <joint name="joint1" type="fixed">
+    <parent link="base_link"/>
+    <child link="link1"/>
+  </joint>
+
+  <!-- Duplicate joint name - should raise ValueError -->
+  <joint name="joint1" type="fixed">
+    <parent link="link1"/>
+    <child link="link2"/>
+  </joint>
+</robot>

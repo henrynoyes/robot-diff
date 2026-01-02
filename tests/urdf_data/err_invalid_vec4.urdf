@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot name="invalid_vec4">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="1.0 1.0 1.0"/>
+      </geometry>
+      <material>
+        <!-- Only 3 values instead of 4 - should raise ValueError -->
+        <color rgba="1.0 0.0 0.0"/>
+      </material>
+    </visual>
+  </link>
+</robot>

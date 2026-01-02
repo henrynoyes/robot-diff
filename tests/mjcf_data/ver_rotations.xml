@@ -1,0 +1,8 @@
+<mujoco model="rotations">
+  <worldbody>
+    <body name="body1">
+      <body name="euler_body" euler="4.71238898 0 0"/>
+      <body name="quat_body" quat="0.707107 0 0 0.707107"/>
+    </body>
+  </worldbody>
+</mujoco>

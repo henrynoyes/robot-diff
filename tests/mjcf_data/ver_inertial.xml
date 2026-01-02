@@ -1,0 +1,13 @@
+<mujoco model="inertial">
+  <worldbody>
+    <body name="no_inertia_body">
+      <inertial pos="0 0 0" mass="0"/>
+    </body>
+    <body name="diag_inertia_body">
+      <inertial pos="0 0 0" mass="10.0" diaginertia="1.0 2.0 3.0"/>
+    </body>
+    <body name="full_inertia_body">
+      <inertial pos="0 0 0" mass="5.0" fullinertia="1.0 0.1 0.2 2.0 0.3 3.0"/>
+    </body>
+  </worldbody>
+</mujoco>

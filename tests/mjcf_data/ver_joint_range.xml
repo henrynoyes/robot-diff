@@ -1,0 +1,9 @@
+<mujoco model="joint_range">
+  <worldbody>
+    <body name="body1">
+      <body name="body2">
+        <joint name="hinge_joint" type="hinge" range="-1.57 1.57"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

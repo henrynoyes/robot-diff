@@ -1,0 +1,79 @@
+#usda 1.0
+(
+    defaultPrim = "inertial"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "inertial" (
+    prepend apiSchemas = ["IsaacRobotAPI"]
+)
+{
+    prepend rel isaac:physics:robotLinks = [
+        </inertial/full_inertial_link>,
+        </inertial/default_inertial_link>,
+        </inertial/no_inertial_link>,
+    ]
+
+    def Xform "full_inertial_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (1, 2, 3)
+        float3 physics:diagonalInertia = (1, 2, 3)
+        float physics:mass = 4.0
+        quatf physics:principalAxes = (0.707107, 0.707107, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+
+    def Xform "default_inertial_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (0, 0, 0)
+        float3 physics:diagonalInertia = (0, 0, 0)
+        float physics:mass = 0
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+
+    def Xform "no_inertial_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+    )
+    {
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+}

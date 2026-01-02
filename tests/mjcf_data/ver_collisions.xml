@@ -1,0 +1,29 @@
+<mujoco model="collisions">
+  <default>
+    <default class="collision">
+      <geom group="3"/>
+    </default>
+  </default>
+
+  <asset>
+    <mesh name="mesh_name" file="assets/body.stl" scale="1 2 3"/>
+  </asset>
+
+  <worldbody>
+    <body name="sphere_body">
+      <geom type="sphere" size="0.2" class="collision"/>
+    </body>
+
+    <body name="box_body">
+      <geom type="box" size="1.0 1.0 1.0" class="collision"/>
+    </body>
+
+    <body name="cylinder_body">
+      <geom type="cylinder" size="0.1 0.5" class="collision"/>
+    </body>
+
+    <body name="mesh_body">
+      <geom mesh="mesh_name" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

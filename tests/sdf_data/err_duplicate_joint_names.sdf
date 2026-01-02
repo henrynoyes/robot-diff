@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<sdf version="1.12">
+  <model name="duplicate_joints">
+    <link name="base_link"/>
+    <link name="link1"/>
+    <link name="link2"/>
+
+    <joint name="joint1" type="fixed">
+      <pose relative_to="base_link"/>
+      <parent>base_link</parent>
+      <child>link1</child>
+    </joint>
+
+    <!-- Duplicate joint name - should raise ValueError -->
+    <joint name="joint1" type="fixed">
+      <parent>link1</parent>
+      <child>link2</child>
+    </joint>
+  </model>
+</sdf>

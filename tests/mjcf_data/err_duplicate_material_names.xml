@@ -1,0 +1,18 @@
+<mujoco model="duplicate_materials">
+  <default>
+    <default class="visual">
+      <geom group="2"/>
+    </default>
+  </default>
+
+  <asset>
+    <material name="my_material" rgba="0 0 1 1"/>
+    <material name="my_material" rgba="1 0 0 1"/>
+  </asset>
+
+  <worldbody>
+    <body name="body1">
+      <geom class="visual" material="my_material"/>
+    </body>
+  </worldbody>
+</mujoco>

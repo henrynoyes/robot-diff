@@ -1,0 +1,31 @@
+<mujoco model="default_values">
+  <default>
+    <default class="collision">
+      <geom group="3"/>
+    </default>
+  </default>
+
+  <worldbody>
+    <body name="def_sphere">
+      <!-- Default geom type (sphere) with no size -->
+      <geom class="collision"/>
+
+      <body name="def_box">
+        <geom type="box" class="collision"/>
+      </body>
+
+      <body name="def_cylinder">
+        <geom type="cylinder" class="collision"/>
+      </body>
+
+      <!-- Nested body with no pos, no quat, no joint (tests defaults) -->
+      <body name="def_fixedjoint"/>
+
+      <!-- Nested body with joint but no type, axis, or range -->
+      <body name="def_joint">
+        <joint name="hinge_joint"/>
+      </body>
+
+    </body>
+  </worldbody>
+</mujoco>

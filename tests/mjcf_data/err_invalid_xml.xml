@@ -1,0 +1,7 @@
+<mujoco model="invalid_xml">
+    <worldbody>
+      <body name="body1">
+        <!-- Missing closing tag -->
+        <geom>
+      </body>
+  </mujoco>

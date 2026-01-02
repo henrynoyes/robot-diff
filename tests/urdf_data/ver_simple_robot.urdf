@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="simple_robot">
+  <link name="base_link"/>
+  <link name="end_link"/>
+
+  <joint name="joint1" type="fixed">
+    <parent link="base_link"/>
+    <child link="end_link"/>
+  </joint>
+</robot>

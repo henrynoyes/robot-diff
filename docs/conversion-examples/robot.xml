@@ -1,0 +1,44 @@
+<mujoco model="robot">
+  <!-- robot-diff convention: collision and visual geoms must be denoted with classes -->
+  <default>
+    <default class="collision">
+      <geom group="0"/>
+    </default>
+    <default class="visual">
+      <geom contype="0" conaffinity="0" group="1"/>
+    </default>
+  </default>
+
+  <asset>
+    <material name="blue" rgba="0.0 0.0 1.0 1.0"/>
+    <material name="red" rgba="1.0 0.0 0.0 1.0"/>
+    <texture name="metal_texture" type="2d" file="textures/metal.png"/>
+    <material name="metal" texture="metal_texture"/>
+    <mesh name="link2_mesh" file="meshes/link2.obj" scale="1.0 1.0 1.0"/>
+  </asset>
+
+  <worldbody>
+    <body name="base_link" pos="0 0 0">
+      <inertial pos="0 0 0.05" mass="1.0" diaginertia="0.01 0.01 0.01"/>
+      <!-- MJCF uses half-extents: size="0.1 0.1 0.05" for 0.2x0.2x0.1 box -->
+      <geom type="box" size="0.1 0.1 0.05" pos="0 0 0.05" class="collision"/>
+      <!-- robot-diff convention: material attribute on geom, not mesh -->
+      <geom type="box" size="0.1 0.1 0.05" pos="0 0 0.05" material="blue" class="visual"/>
+
+      <body name="link1" pos="0 0 0.1">
+        <inertial pos="0 0 0.25" mass="0.5" diaginertia="0.005 0.005 0.001"/>
+        <joint name="joint1" type="hinge" axis="0 0 1" range="-1.57 1.57"/>
+        <!-- MJCF cylinder size: (radius, half-length) = (0.05, 0.25) for length=0.5 -->
+        <geom type="cylinder" size="0.05 0.25" pos="0 0 0.25" class="collision"/>
+        <geom type="cylinder" size="0.05 0.25" pos="0 0 0.25" material="red" class="visual"/>
+
+        <body name="link2" pos="0 0 0.5">
+          <inertial pos="0 0 0" mass="0.3" diaginertia="0.001 0.001 0.001"/>
+          <joint name="joint2" type="slide" axis="0 0 1" range="0 0.3"/>
+          <geom type="sphere" size="0.08" pos="0 0 0" class="collision"/>
+          <geom type="mesh" mesh="link2_mesh" pos="0 0 0" material="metal" class="visual"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

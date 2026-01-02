@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<sdf version="1.12">
+  <model name="joint_limits">
+    <link name="base_link"/>
+    <link name="link1">
+      <pose relative_to="revolute_joint"/>
+    </link>
+    <link name="link2">
+      <pose relative_to="prismatic_joint"/>
+    </link>
+    <link name="link3">
+      <pose relative_to="fixed_joint"/>
+    </link>
+
+    <joint name="revolute_joint" type="revolute">
+      <pose relative_to="base_link"/>
+      <parent>base_link</parent>
+      <child>link1</child>
+      <axis>
+        <xyz>0.0 0.0 1.0</xyz>
+        <limit>
+          <lower>-1.57</lower>
+          <upper>1.57</upper>
+          <effort>100.0</effort>
+          <velocity>2.0</velocity>
+        </limit>
+      </axis>
+    </joint>
+
+    <joint name="prismatic_joint" type="prismatic">
+      <pose relative_to="link1"/>
+      <parent>link1</parent>
+      <child>link2</child>
+      <axis>
+        <xyz>0.0 0.0 1.0</xyz>
+        <limit>
+          <lower>-0.5</lower>
+          <upper>0.5</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <joint name="fixed_joint" type="fixed">
+      <pose relative_to="link2"/>
+      <parent>link2</parent>
+      <child>link3</child>
+    </joint>
+  </model>
+</sdf>

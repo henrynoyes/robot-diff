@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot name="default_axis">
+  <link name="base_link"/>
+  <link name="end_link"/>
+
+  <joint name="joint1" type="revolute">
+    <parent link="base_link"/>
+    <child link="end_link"/>
+    <!-- No axis element - should use default (1, 0, 0) -->
+  </joint>
+</robot>

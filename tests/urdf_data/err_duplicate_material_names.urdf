@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot name="duplicate_materials">
+  <material name="blue_material">
+    <color rgba="0 0 1 1"/>
+  </material>
+
+  <!-- Duplicate material name - should raise ValueError -->
+  <material name="blue_material">
+    <color rgba="1 0 0 1"/>
+  </material>
+
+  <link name="base_link"/>
+</robot>

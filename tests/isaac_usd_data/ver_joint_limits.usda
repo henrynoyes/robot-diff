@@ -1,0 +1,186 @@
+#usda 1.0
+(
+    defaultPrim = "joint_limits"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "joint_limits" (
+    prepend apiSchemas = ["IsaacRobotAPI"]
+)
+{
+    prepend rel isaac:physics:robotLinks = [
+        </joint_limits/base_link>,
+        </joint_limits/link1>,
+        </joint_limits/link2>,
+        </joint_limits/link3>,
+        </joint_limits/link4>,
+    ]
+    prepend rel isaac:physics:robotJoints = [
+        </joint_limits/revolute_joint>,
+        </joint_limits/continuous_joint>,
+        </joint_limits/fixed_joint>,
+        </joint_limits/prismatic_joint>,
+    ]
+
+    def Xform "base_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsArticulationRootAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (0, 0, 0)
+        float3 physics:diagonalInertia = (0, 0, 0)
+        float physics:mass = 0
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+
+    def Xform "link1" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (0, 0, 0)
+        float3 physics:diagonalInertia = (0, 0, 0)
+        float physics:mass = 0
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+
+    def Xform "link2" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (0, 0, 0)
+        float3 physics:diagonalInertia = (0, 0, 0)
+        float physics:mass = 0
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+
+    def Xform "link3" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (0, 0, 0)
+        float3 physics:diagonalInertia = (0, 0, 0)
+        float physics:mass = 0
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+
+    def Xform "link4" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (0, 0, 0)
+        float3 physics:diagonalInertia = (0, 0, 0)
+        float physics:mass = 0
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+
+    def PhysicsRevoluteJoint "revolute_joint"
+    {
+        rel physics:body0 = </joint_limits/base_link>
+        rel physics:body1 = </joint_limits/link1>
+        uniform token physics:axis = "Z"
+        float physics:lowerLimit = -90
+        float physics:upperLimit = 90
+        point3f physics:localPos0 = (0, 0, 0)
+        point3f physics:localPos1 = (0, 0, 0)
+        quatf physics:localRot0 = (1, 0, 0, 0)
+        quatf physics:localRot1 = (1, 0, 0, 0)
+        float drive:angular:physics:maxForce = 100
+        float physxJoint:maxJointVelocity = 180
+    }
+
+    def PhysicsRevoluteJoint "continuous_joint"
+    {
+        rel physics:body0 = </joint_limits/link1>
+        rel physics:body1 = </joint_limits/link2>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (0, 0, 0)
+        point3f physics:localPos1 = (0, 0, 0)
+        quatf physics:localRot0 = (1, 0, 0, 0)
+        quatf physics:localRot1 = (1, 0, 0, 0)
+    }
+
+    def PhysicsFixedJoint "fixed_joint"
+    {
+        rel physics:body0 = </joint_limits/link2>
+        rel physics:body1 = </joint_limits/link3>
+        point3f physics:localPos0 = (0, 0, 0)
+        point3f physics:localPos1 = (0, 0, 0)
+        quatf physics:localRot0 = (1, 0, 0, 0)
+        quatf physics:localRot1 = (1, 0, 0, 0)
+    }
+
+    def PhysicsPrismaticJoint "prismatic_joint"
+    {
+        rel physics:body0 = </joint_limits/link3>
+        rel physics:body1 = </joint_limits/link4>
+        uniform token physics:axis = "Z"
+        float physics:lowerLimit = -0.5
+        float physics:upperLimit = 0.5
+        point3f physics:localPos0 = (0, 0, 0)
+        point3f physics:localPos1 = (0, 0, 0)
+        quatf physics:localRot0 = (1, 0, 0, 0)
+        quatf physics:localRot1 = (1, 0, 0, 0)
+        float drive:linear:physics:maxForce = 50
+        float physxJoint:maxJointVelocity = 1.0
+    }
+}

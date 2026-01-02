@@ -1,0 +1,29 @@
+<mujoco model="visuals">
+  <compiler meshdir="assets"/>
+  <default>
+    <default class="visual">
+      <geom group="2"/>
+    </default>
+  </default>
+
+  <asset>
+    <mesh file="body.obj"/>
+    <texture name="metal_texture" file="metal.png"/>
+    <material name="blue_material" rgba="0 0 1 1"/>
+    <material name="textured_material" texture="metal_texture"/>
+  </asset>
+
+  <worldbody>
+    <body name="green_body">
+      <geom type="box" size="0.5 0.5 0.5" class="visual" material="green_material" rgba="0 1 0 1"/>
+    </body>
+
+    <body name="blue_body">
+      <geom type="mesh" mesh="body" class="visual" material="blue_material"/>
+    </body>
+
+    <body name="metal_body">
+      <geom type="sphere" size="0.2" class="visual" material="textured_material"/>
+    </body>
+  </worldbody>
+</mujoco>

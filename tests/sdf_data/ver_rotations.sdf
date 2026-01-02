@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<sdf version="1.12">
+  <model name="rotations">
+    <link name="base_link"/>
+    <link name="link1">
+      <pose relative_to="euler_joint"/>
+    </link>
+    <link name="link2">
+      <pose relative_to="quat_joint"/>
+    </link>
+    <link name="link3">
+      <pose relative_to="empty_pose_joint"/>
+    </link>
+
+    <joint name="euler_joint" type="fixed">
+      <pose relative_to="base_link">0 0 0 4.71238898 0 0</pose>
+      <parent>base_link</parent>
+      <child>link1</child>
+    </joint>
+
+    <joint name="quat_joint" type="fixed">
+      <pose relative_to="base_link" rotation_format="quat_xyzw">0 0 0 0 0 0.707107 0.707107</pose>
+      <parent>base_link</parent>
+      <child>link2</child>
+    </joint>
+
+    <joint name="empty_pose_joint" type="fixed">
+      <pose relative_to="base_link"/>
+      <parent>base_link</parent>
+      <child>link3</child>
+    </joint>
+  </model>
+</sdf>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<sdf version="1.12">
+  <model name="inertial">
+    <link name="full_inertia_link">
+      <inertial>
+        <pose>1.0 2.0 3.0 0 0 0</pose>
+        <mass>10.0</mass>
+        <inertia>
+          <ixx>1.0</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>1.0</iyy>
+          <iyz>0.0</iyz>
+          <izz>1.0</izz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <link name="no_inertia_link">
+      <inertial/>
+    </link>
+
+    <link name="empty_link"/>
+  </model>
+</sdf>

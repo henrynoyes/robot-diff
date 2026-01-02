@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<sdf version="1.12">
+  <model name="collisions">
+    <link name="sphere_link">
+      <collision name="sphere_collision">
+        <geometry>
+          <sphere>
+            <radius>0.2</radius>
+          </sphere>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="box_link">
+      <collision name="box_collision">
+        <geometry>
+          <box>
+            <size>1.0 1.0 1.0</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="cylinder_link">
+      <collision name="cylinder_collision">
+        <geometry>
+          <cylinder>
+            <radius>0.1</radius>
+            <length>0.5</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="mesh_link">
+      <collision name="mesh_collision">
+        <geometry>
+          <mesh>
+            <uri>assets/body.gltf</uri>
+            <scale>1.0 1.0 1.0</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name="box_collision">
+        <geometry>
+          <box>
+            <size>0.2 0.2 0.2</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="empty_link"/>
+  </model>
+</sdf>

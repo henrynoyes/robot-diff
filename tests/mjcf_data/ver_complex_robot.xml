@@ -1,0 +1,17 @@
+<mujoco model="complex_robot">
+  <worldbody>
+    <body name="body1">
+      <body name="body2" pos="0 0 1">
+        <joint name="hinge_joint" type="hinge"/>
+
+        <body name="body3" pos="0 0 0.5">
+          <joint name="slide_joint" type="slide"/>
+
+          <body name="body4" pos="0 0 0.5">
+            <joint name="ball_joint" type="ball"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<sdf version="1.12">
+  <model name="complex_robot">
+    <link name="base_link"/>
+    <link name="link1">
+      <pose relative_to="fixed_joint"/>
+    </link>
+    <link name="link2">
+      <pose relative_to="revolute_joint"/>
+    </link>
+    <link name="link3">
+      <pose relative_to="prismatic_joint"/>
+    </link>
+
+    <joint name="fixed_joint" type="fixed">
+      <pose relative_to="base_link"/>
+      <parent>base_link</parent>
+      <child>link1</child>
+    </joint>
+
+    <joint name="revolute_joint" type="revolute">
+      <pose relative_to="link1">0.0 0.0 1.0 0.0 0.0 0.0</pose>
+      <parent>link1</parent>
+      <child>link2</child>
+      <axis>
+        <xyz>0.0 0.0 1.0</xyz>
+      </axis>
+    </joint>
+
+    <joint name="prismatic_joint" type="prismatic">
+      <pose relative_to="link2">0.0 0.0 0.5 0.0 0.0 0.0</pose>
+      <parent>link2</parent>
+      <child>link3</child>
+      <axis>
+        <xyz>0.0 0.0 1.0</xyz>
+      </axis>
+    </joint>
+  </model>
+</sdf>

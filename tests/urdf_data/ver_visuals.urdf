@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<robot name="visuals">
+  <material name="blue_material">
+    <color rgba="0 0 1 1"/>
+  </material>
+
+  <material name="red_material">
+    <color rgba="1 0 0 1"/>
+    <texture filename="assets/red_texture.png"/>
+  </material>
+
+  <material name="metal_material">
+    <texture filename="assets/metal.png"/>
+  </material>
+
+  <link name="blue_link">
+    <visual>
+      <geometry>
+        <box size="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="blue_material"/>
+    </visual>
+  </link>
+
+  <link name="wood_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.1" length="0.5"/>
+      </geometry>
+      <material name="wood">
+        <color rgba="0 1 0 1"/>
+        <texture filename="assets/wood.png"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="metal_link">
+    <visual>
+      <geometry>
+        <sphere radius="0.2"/>
+      </geometry>
+      <material name="metal_material"/>
+    </visual>
+  </link>
+
+  <link name="red_link">
+    <visual>
+      <geometry>
+        <sphere radius="0.3"/>
+      </geometry>
+      <material name="red_material"/>
+    </visual>
+  </link>
+
+  <link name="dual_visual_link">
+    <visual>
+      <geometry>
+        <mesh filename="assets/body.dae" scale="1.0 1.0 1.0"/>
+      </geometry>
+    </visual>
+    <visual>
+      <geometry>
+        <box size="0.2 0.2 0.2"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="empty_link"/>
+</robot>
