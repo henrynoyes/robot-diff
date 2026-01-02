@@ -1,0 +1,119 @@
+#usda 1.0
+(
+    defaultPrim = "cylinder_axes"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "cylinder_axes" (
+    prepend apiSchemas = ["IsaacRobotAPI"]
+)
+{
+    prepend rel isaac:physics:robotLinks = [
+        </cylinder_axes/x_axis_link>,
+        </cylinder_axes/y_axis_link>,
+        </cylinder_axes/z_axis_link>,
+    ]
+
+    def Xform "x_axis_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+    )
+    {
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+            def Xform "cylinder_collision"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (3, 2, 1)
+                float3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Cylinder "cylinder" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "X"
+                    double height = 1.0
+                    double radius = 0.5
+                }
+            }
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+
+    def Xform "y_axis_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+    )
+    {
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+            def Xform "cylinder_collision"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (1, 3, 2)
+                float3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Cylinder "cylinder" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Y"
+                    double height = 1.0
+                    double radius = 0.5
+                }
+            }
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+
+    def Xform "z_axis_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+    )
+    {
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+            def Xform "cylinder_collision"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (2, 1, 3)
+                float3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Cylinder "cylinder" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 1.0
+                    double radius = 0.5
+                }
+            }
+        }
+
+        def Xform "visuals"
+        {
+        }
+    }
+}

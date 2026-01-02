@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="invalid_xml">
+  <link name="base_link"/>
+  <!-- Missing closing tag - should cause XML syntax error -->
+  <link name="end_link">
+</robot>

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<sdf version="1.12">
+  <model name="visuals">
+    <link name="blue_link">
+      <visual name="blue_visual">
+        <geometry>
+          <box>
+            <size>1.0 1.0 1.0</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>0.0 0.0 1.0 1.0</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <link name="metal_link">
+      <visual name="metal_visual">
+        <geometry>
+          <cylinder>
+            <radius>0.1</radius>
+            <length>0.5</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>metal_material</name>
+            <uri>assets/metal.png</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="wood_link">
+      <visual name="wood_visual">
+        <geometry>
+          <sphere>
+            <radius>0.2</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <diffuse>0.0 1.0 0.0 1.0</diffuse>
+          <script>
+            <name>wood</name>
+            <uri>assets/wood.png</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="dual_visual_link">
+      <visual name="mesh_visual">
+        <geometry>
+          <mesh>
+            <uri>assets/body.gltf</uri>
+            <scale>1.0 1.0 1.0</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name="box_visual">
+        <geometry>
+          <box>
+            <size>0.2 0.2 0.2</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+
+    <link name="empty_link"/>
+  </model>
+</sdf>

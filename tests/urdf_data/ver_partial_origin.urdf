@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<robot name="partial_origin">
+  <link name="base_link"/>
+  <link name="link1"/>
+  <link name="link2"/>
+
+  <joint name="joint1" type="fixed">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <!-- Only xyz specified, rpy should use default -->
+    <origin xyz="1.0 2.0 3.0"/>
+  </joint>
+
+  <joint name="joint2" type="fixed">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <!-- Only rpy specified, xyz should use default -->
+    <origin rpy="3.14159265 0.0 0.0"/>
+  </joint>
+</robot>

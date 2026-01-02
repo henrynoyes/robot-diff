@@ -1,0 +1,14 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment
+.venv/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Linting/Formatting
+.ruff_cache/

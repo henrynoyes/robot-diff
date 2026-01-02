@@ -1,0 +1,208 @@
+#usda 1.0
+(
+    defaultPrim = "robot"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "robot" (
+    prepend apiSchemas = ["IsaacRobotAPI"]
+)
+{
+    # robot-diff convention: all links and joints at same level with relationships
+    prepend rel isaac:physics:robotLinks = [
+        </robot/base_link>,
+        </robot/link1>,
+        </robot/link2>,
+    ]
+    prepend rel isaac:physics:robotJoints = [
+        </robot/joint1>,
+        </robot/joint2>,
+    ]
+
+    def Xform "base_link" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsArticulationRootAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (0, 0, 0.05)
+        float3 physics:diagonalInertia = (0.01, 0.01, 0.01)
+        float physics:mass = 1
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        # robot-diff convention: separate collisions and visuals Xform groups
+        def Xform "collisions"
+        {
+            def Xform "base_collision"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (0.2, 0.2, 0.1)
+                float3 xformOp:translate = (0, 0, 0.05)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Cube "geometry" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    float3[] extent = [(-0.1, -0.1, -0.05), (0.1, 0.1, 0.05)]
+                    double size = 1
+                }
+            }
+        }
+
+        def Xform "visuals"
+        {
+            def Xform "base_visual"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (0.2, 0.2, 0.1)
+                float3 xformOp:translate = (0, 0, 0.05)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Cube "geometry"
+                {
+                    float3[] extent = [(-0.1, -0.1, -0.05), (0.1, 0.1, 0.05)]
+                    double size = 1
+                }
+            }
+        }
+    }
+
+    def Xform "link1" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (0, 0, 0.25)
+        float3 physics:diagonalInertia = (0.005, 0.005, 0.001)
+        float physics:mass = 0.5
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+            def Xform "link1_collision"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (1, 1, 1)
+                float3 xformOp:translate = (0, 0, 0.25)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Cylinder "geometry" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    float3[] extent = [(-0.05, -0.05, -0.25), (0.05, 0.05, 0.25)]
+                    double height = 0.5
+                    double radius = 0.05
+                }
+            }
+        }
+
+        def Xform "visuals"
+        {
+            def Xform "link1_visual"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (1, 1, 1)
+                float3 xformOp:translate = (0, 0, 0.25)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Cylinder "geometry"
+                {
+                    uniform token axis = "Z"
+                    float3[] extent = [(-0.05, -0.05, -0.25), (0.05, 0.05, 0.25)]
+                    double height = 0.5
+                    double radius = 0.05
+                }
+            }
+        }
+    }
+
+    def Xform "link2" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        float3 physics:centerOfMass = (0, 0, 0)
+        float3 physics:diagonalInertia = (0.001, 0.001, 0.001)
+        float physics:mass = 0.3
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "collisions"
+        {
+            def Xform "link2_collision"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (1, 1, 1)
+                float3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Sphere "geometry" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    float3[] extent = [(-0.08, -0.08, -0.08), (0.08, 0.08, 0.08)]
+                    double radius = 0.08
+                }
+            }
+        }
+
+        def Xform "visuals"
+        {
+            def Xform "link2_visual"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (1, 1, 1)
+                float3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Mesh "geometry" (
+                    prepend references = @./meshes/link2.usd@
+                )
+                {
+                }
+            }
+        }
+    }
+
+    # Isaac convention: revolute joint limits in degrees
+    def PhysicsRevoluteJoint "joint1"
+    {
+        uniform token physics:axis = "Z"
+        rel physics:body0 = </robot/base_link>
+        rel physics:body1 = </robot/link1>
+        float physics:lowerLimit = -89.95437
+        float physics:upperLimit = 89.95437
+        point3f physics:localPos0 = (0, 0, 0.1)
+        point3f physics:localPos1 = (0, 0, 0)
+        quatf physics:localRot0 = (1, 0, 0, 0)
+        quatf physics:localRot1 = (1, 0, 0, 0)
+        float drive:angular:physics:maxForce = 10
+        float physxJoint:maxJointVelocity = 57.29578
+    }
+
+    def PhysicsPrismaticJoint "joint2"
+    {
+        uniform token physics:axis = "Z"
+        rel physics:body0 = </robot/link1>
+        rel physics:body1 = </robot/link2>
+        float physics:lowerLimit = 0
+        float physics:upperLimit = 0.3
+        point3f physics:localPos0 = (0, 0, 0.5)
+        point3f physics:localPos1 = (0, 0, 0)
+        quatf physics:localRot0 = (1, 0, 0, 0)
+        quatf physics:localRot1 = (1, 0, 0, 0)
+        float drive:linear:physics:maxForce = 5
+        float physxJoint:maxJointVelocity = 0.5
+    }
+}

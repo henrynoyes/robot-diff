@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<robot name="collisions">
+  <link name="sphere_link">
+    <collision>
+      <geometry>
+        <sphere radius="0.2"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="box_link">
+    <collision>
+      <geometry>
+        <box size="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="cylinder_link">
+    <collision>
+      <geometry>
+        <cylinder radius="0.1" length="0.5"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="mesh_link">
+    <collision>
+      <geometry>
+        <mesh filename="assets/body.dae" scale="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>
+    <collision>
+      <geometry>
+        <box size="0.2 0.2 0.2"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="empty_link"/>
+</robot>

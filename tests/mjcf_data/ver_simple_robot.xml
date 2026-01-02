@@ -1,0 +1,9 @@
+<mujoco model="simple_robot">
+  <worldbody>
+    <body name="body1">
+      <body name="body2">
+        <joint name="joint1"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

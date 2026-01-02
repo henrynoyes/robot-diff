@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<robot name="invalid_vec3">
+  <link name="base_link"/>
+  <link name="end_link"/>
+
+  <joint name="joint1" type="fixed">
+    <parent link="base_link"/>
+    <child link="end_link"/>
+    <!-- Only 2 values instead of 3 - should raise ValueError -->
+    <origin xyz="1.0 2.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+</robot>

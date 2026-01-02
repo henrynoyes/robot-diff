@@ -1,0 +1,32 @@
+<mujoco model="classes">
+  <default>
+    <default class="visual">
+      <geom rgba="1 1 1 1"/>
+    </default>
+    <default class="collision">
+      <geom rgba="0.5 0.5 0.5 0.5"/>
+
+      <default class="foot">
+        <geom type="sphere"/>
+      </default>
+    </default>
+    <default class="hinge">
+      <joint type="hinge" range="-1.57 1.57"/>
+    </default>
+  </default>
+
+  <worldbody>
+    <body name="body1">
+      <geom type="box" size="0.5 0.5 0.5" class="visual"/>
+
+      <body name="body2">
+        <joint name="hinge_joint" class="hinge"/>
+        <geom type="sphere" size="0.2" class="collision"/>
+
+        <body name="body3">
+          <geom size="0.15" class="foot"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

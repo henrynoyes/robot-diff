@@ -1,0 +1,9 @@
+<mujoco model="freejoint">
+  <worldbody>
+    <body name="body1">
+      <body name="free_body">
+        <freejoint name="free_joint"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>
