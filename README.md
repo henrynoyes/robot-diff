@@ -161,7 +161,7 @@ configuration/
 ```
 where the `Physics`, `Robot`, and `Sensor` Variant Sets encode the relevant information using the [Isaac Robot Schema](https://docs.isaacsim.omniverse.nvidia.com/5.1.0/omniverse_usd/robot_schema.html). The `.usda`/`.usdc` file extensions<sup>\[1\]</sup> are adopted to [follow the OpenUSD best practices](https://docs.nvidia.com/learn-openusd/latest/stage-setting/usd-file-formats.html). In the future, this implementation could be expanded to other USD structures such as the hierarchical style produced by the [mujoco-usd-converter](https://github.com/newton-physics/mujoco-usd-converter/tree/main). Due to the immaturity of such alternative formats, this was not included in the initial release.
 
-\[1\] They can be automatically generated using the [`codify-usd.sh`]() script, though this is not necessary as the file extensions do not influence parsing.
+\[1\] They can be automatically generated using this [`codify-usd.sh`](https://gist.github.com/henrynoyes/b77621547422529ce4b4698a62ec8799) script, though this is not necessary as the file extensions do not influence parsing.
 
 #### Materials
 
@@ -178,3 +178,5 @@ Visit the [appendix](docs/APPENDIX.md) for a more verbose discussion on the just
 ## Future Features
 
 - [ ] Support arbitrary pose declaration in `SDFParser`
+
+- [ ] Add conversion between **XML formats** with `robot-diff convert` (leave USD creation to [Isaac](https://isaac-sim.github.io/IsaacLab/main/source/how-to/import_new_asset.html) and [Newton](https://github.com/newton-physics/mujoco-usd-converter) for now)
