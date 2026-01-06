@@ -114,37 +114,6 @@ class XMLParser:
 
         return tuple(round(sign * q, precision) for q in (qw, qx, qy, qz))
 
-    # ~~
-    def _format_quat(
-        self, quat: tuple[float, float, float, float], precision: int = 6
-    ) -> tuple[float, float, float, float]:
-        """Convert quat to standard format
-
-        Args:
-            quat: (w, x, y, z) unit quaternion
-            precision: Number of decimal places to round to, defaults to 6
-
-        Returns:
-            Formatted (w, x, y, z) unit quaternion
-        """
-        formatted = tuple(round(q, precision) for q in quat)
-        if formatted[0] < 0:
-            return tuple(-q for q in formatted)
-        else:
-            return formatted
-
-    # ~~
-    def _get_element_path(self, elem: etree._Element) -> str:
-        """Get XPath for element
-
-        Args:
-            elem: Element to get path for
-
-        Returns:
-            XPath string
-        """
-        return self._tree.getpath(elem)
-
     def _get_source_metadata(self, elem: etree._Element) -> dict:
         """Get source tracking metadata for element
 
@@ -183,7 +152,7 @@ class URDFParser(XMLParser):
         links = self._parse_links(root)
         joints = self._parse_joints(root)
 
-        return Robot(name=robot_name, links=links, joints=joints)  # type: ignore[invalid-argument-type]
+        return Robot(name=robot_name, links=links, joints=joints)  # ty: ignore[invalid-argument-type]
 
     def _parse_global_materials(self, root: etree._Element) -> dict[str, Material]:
         """Parse all global material elements
@@ -330,7 +299,7 @@ class URDFParser(XMLParser):
             Geometry object, or None if no geometry is defined
         """
         geometry_elem = parent_elem.find("geometry")
-        shape_elem = geometry_elem[0]  # type: ignore[index]
+        shape_elem = geometry_elem[0]  # ty: ignore[not-subscriptable]
 
         if shape_elem.tag == "box":
             size = self._parse_vector(shape_elem.get("size", "0 0 0"), 3)
@@ -405,7 +374,7 @@ class URDFParser(XMLParser):
 
         return Material(
             name=name,
-            rgba=rgba,  # type: ignore[invalid-argument-type]
+            rgba=rgba,  # ty: ignore[invalid-argument-type]
             texture_filename=texture_filename,
             **self._get_source_metadata(material_elem),
         )
@@ -441,9 +410,9 @@ class URDFParser(XMLParser):
 
             joints[name] = Joint(
                 name=name,
-                type=joint_type,  # type: ignore[invalid-argument-type]
-                parent=parent,  # type: ignore[invalid-argument-type]
-                child=child,  # type: ignore[invalid-argument-type]
+                type=joint_type,  # ty: ignore[invalid-argument-type]
+                parent=parent,  # ty: ignore[invalid-argument-type]
+                child=child,  # ty: ignore[invalid-argument-type]
                 origin=origin,
                 axis=axis,
                 limit=limit,
@@ -467,9 +436,9 @@ class URDFParser(XMLParser):
 
         xyz = self._parse_vector(origin_elem.get("xyz", "0 0 0"), 3)
         rpy = self._parse_vector(origin_elem.get("rpy", "0 0 0"), 3)
-        quat = self._rpy_to_quat(rpy)  # type: ignore[invalid-argument-type]
+        quat = self._rpy_to_quat(rpy)  # ty: ignore[invalid-argument-type]
 
-        return Pose(xyz=xyz, quat=quat, **self._get_source_metadata(origin_elem))  # type: ignore[invalid-argument-type]
+        return Pose(xyz=xyz, quat=quat, **self._get_source_metadata(origin_elem))  # ty: ignore[invalid-argument-type]
 
     def _parse_axis(self, joint_elem: etree._Element) -> tuple[float, float, float]:
         """Parse axis element
@@ -484,7 +453,7 @@ class URDFParser(XMLParser):
         if axis_elem is None:
             return (1.0, 0.0, 0.0)
 
-        return self._parse_vector(axis_elem.get("xyz", "1 0 0"), 3)  # type: ignore[invalid-argument-type]
+        return self._parse_vector(axis_elem.get("xyz", "1 0 0"), 3)  # ty: ignore[invalid-return-type]
 
     def _parse_limit(self, joint_elem: etree._Element) -> Limit | None:
         """Parse limit element
@@ -528,10 +497,10 @@ class SDFParser(XMLParser):
         model_elem = root.find("model")
         robot_name = model_elem.get("name")
 
-        joints = self._parse_joints(model_elem)  # type: ignore[invalid-argument-type]
-        links = self._parse_links(model_elem, joints)  # type: ignore[invalid-argument-type]
+        joints = self._parse_joints(model_elem)  # ty: ignore[invalid-argument-type]
+        links = self._parse_links(model_elem, joints)  # ty: ignore[invalid-argument-type]
 
-        return Robot(name=robot_name, links=links, joints=joints)  # type: ignore[invalid-argument-type]
+        return Robot(name=robot_name, links=links, joints=joints)  # ty: ignore[invalid-argument-type]
 
     def _parse_joints(self, model_elem: etree._Element) -> dict[str, Joint]:
         """Parse all joint elements
@@ -568,9 +537,9 @@ class SDFParser(XMLParser):
 
             joints[name] = Joint(
                 name=name,
-                type=joint_type,  # type: ignore[invalid-argument-type]
-                parent=parent,  # type: ignore[invalid-argument-type]
-                child=child,  # type: ignore[invalid-argument-type]
+                type=joint_type,  # ty: ignore[invalid-argument-type]
+                parent=parent,  # ty: ignore[invalid-argument-type]
+                child=child,  # ty: ignore[invalid-argument-type]
                 origin=origin,
                 axis=axis,
                 limit=limit,
@@ -689,7 +658,7 @@ class SDFParser(XMLParser):
             Geometry object, or None if no geometry is defined
         """
         geometry_elem = parent_elem.find("geometry")
-        shape_elem = geometry_elem[0]  # type: ignore[index]
+        shape_elem = geometry_elem[0]  # ty: ignore[not-subscriptable]
 
         if shape_elem.tag == "box":
             size = self._parse_vector(shape_elem.findtext("size", "0 0 0"), 3)
@@ -810,7 +779,7 @@ class SDFParser(XMLParser):
         if axis_elem is None:
             return (1.0, 0.0, 0.0)
 
-        return self._parse_vector(axis_elem.findtext("xyz", "1 0 0"), 3)  # type: ignore[invalid-argument-type]
+        return self._parse_vector(axis_elem.findtext("xyz", "1 0 0"), 3)  # ty: ignore[invalid-return-type]
 
     def _parse_limit(self, joint_elem: etree._Element) -> Limit | None:
         """Parse limit element
@@ -865,7 +834,7 @@ class MJCFParser(XMLParser):
         joints = {}
 
         worldbody = root.find("worldbody")
-        self._parse_bodies(worldbody, None, links, joints)  # type: ignore[invalid-argument-type]
+        self._parse_bodies(worldbody, None, links, joints)  # ty: ignore[invalid-argument-type]
 
         return Robot(name=robot_name, links=links, joints=joints)
 
@@ -895,7 +864,6 @@ class MJCFParser(XMLParser):
             parent_class: Name of parent class
             classes: Dict to populate with class data
         """
-        # NOTE class name is required by schema
         class_name = default_elem.get("class", "main")
 
         classes[class_name] = {"parent": parent_class}
@@ -925,7 +893,7 @@ class MJCFParser(XMLParser):
         class_data = self._classes[class_name]
 
         # recursively get parent defaults
-        defaults = self._get_class_defaults(class_data.get("parent"), element_type)  # type: ignore[invalid-argument-type]
+        defaults = self._get_class_defaults(class_data.get("parent"), element_type)  # ty: ignore[invalid-argument-type]
 
         # stack child data
         if element_type in class_data:
@@ -971,7 +939,7 @@ class MJCFParser(XMLParser):
 
             materials[name] = Material(
                 name=name,
-                rgba=rgba,  # type: ignore[invalid-argument-type]
+                rgba=rgba,  # ty: ignore[invalid-argument-type]
                 texture_filename=texture_filename,
                 **self._get_source_metadata(material_elem),
             )
@@ -1033,7 +1001,7 @@ class MJCFParser(XMLParser):
                 scale_str = mesh_elem.get("scale", "1 1 1")
                 scale = self._parse_vector(scale_str, 3)
 
-                meshes[name] = Mesh(filename=filename, scale=scale, **self._get_source_metadata(mesh_elem))  # type: ignore[invalid-argument-type]
+                meshes[name] = Mesh(filename=filename, scale=scale, **self._get_source_metadata(mesh_elem))  # ty: ignore[invalid-argument-type]
 
         return meshes
 
@@ -1178,7 +1146,7 @@ class MJCFParser(XMLParser):
         if geom_type == "box":
             if size_str:
                 size = tuple(2 * x for x in self._parse_vector(size_str, 3))  # MJCF uses half-extents
-                return Box(size=size, **self._get_source_metadata(geom_elem))  # type: ignore[invalid-argument-type]
+                return Box(size=size, **self._get_source_metadata(geom_elem))  # ty: ignore[invalid-argument-type]
             else:
                 return Box(**self._get_source_metadata(geom_elem))
 
@@ -1226,7 +1194,7 @@ class MJCFParser(XMLParser):
 
         return Material(
             name=material_name,
-            rgba=rgba,  # type: ignore[invalid-argument-type]
+            rgba=rgba,  # ty: ignore[invalid-argument-type]
             texture_filename=texture_filename,
             **self._get_source_metadata(geom_elem),
         )
@@ -1286,7 +1254,7 @@ class MJCFParser(XMLParser):
                 parent=parent_name,
                 child=child_name,
                 origin=origin,
-                axis=axis,  # type: ignore[invalid-argument-type]
+                axis=axis,  # ty: ignore[invalid-argument-type]
                 limit=limit,
                 **self._get_source_metadata(joint_elem),
             )
@@ -1320,16 +1288,15 @@ class MJCFParser(XMLParser):
         quat_str = elem.get("quat") or class_defaults.get("quat")
         euler_str = elem.get("euler") or class_defaults.get("euler")
 
-        # TODO add axis angle support?
         if quat_str:
-            quat = self._parse_vector(quat_str, 4)  # NOTE should this be formatted? right now im leaning no
+            quat = self._parse_vector(quat_str, 4)
         elif euler_str:
             rpy = self._parse_vector(euler_str, 3)
-            quat = self._rpy_to_quat(rpy)  # type: ignore[invalid-argument-type]
+            quat = self._rpy_to_quat(rpy)  # ty: ignore[invalid-argument-type]
         else:
             quat = (1.0, 0.0, 0.0, 0.0)
 
-        return Pose(xyz=xyz, quat=quat, **self._get_source_metadata(elem))  # type: ignore[invalid-argument-type]
+        return Pose(xyz=xyz, quat=quat, **self._get_source_metadata(elem))  # ty: ignore[invalid-argument-type]
 
 
 class USDParser:
@@ -1455,7 +1422,7 @@ class IsaacUSDParser(USDParser):
         gf_quat = mass_api.GetPrincipalAxesAttr().Get().GetNormalized()
         quat = (gf_quat.GetReal(), *gf_quat.GetImaginary())
 
-        origin = Pose(xyz=xyz, quat=quat)  # type: ignore[invalid-argument-type]
+        origin = Pose(xyz=xyz, quat=quat)  # ty: ignore[invalid-argument-type]
 
         diag = mass_api.GetDiagonalInertiaAttr().Get()
         inertia = Inertia(ixx=diag[0], iyy=diag[1], izz=diag[2])
@@ -1514,7 +1481,7 @@ class IsaacUSDParser(USDParser):
         xyz = tuple(trans)  # ty: ignore[invalid-argument-type]
         quat = (rot.GetReal(), *rot.GetImaginary())
 
-        return Pose(xyz=xyz, quat=quat)  # type: ignore[invalid-argument-type]
+        return Pose(xyz=xyz, quat=quat)  # ty: ignore[invalid-argument-type]
 
     def _parse_geometry(self, geom_prim: Usd.Prim, scale: tuple[float, float, float]) -> Geometry | None:
         """Parse geometry from prim
@@ -1641,7 +1608,7 @@ class IsaacUSDParser(USDParser):
 
             origin = Pose(
                 xyz=tuple(pos),
-                quat=(rot_quat.GetReal(), *rot_quat.GetImaginary()),  # type: ignore[invalid-argument-type]
+                quat=(rot_quat.GetReal(), *rot_quat.GetImaginary()),  # ty: ignore[invalid-argument-type]
             )
 
             type_str = joint_prim.GetTypeName()
@@ -1689,7 +1656,7 @@ class IsaacUSDParser(USDParser):
                 parent=parent_name,
                 child=child_name,
                 origin=origin,
-                axis=axis,  # type: ignore[invalid-argument-type]
+                axis=axis,  # ty: ignore[invalid-argument-type]
                 limit=limit,
                 **self._get_source_metadata(joint_prim),
             )
