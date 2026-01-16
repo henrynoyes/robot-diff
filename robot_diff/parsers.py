@@ -1070,7 +1070,7 @@ class MJCFParser(XMLParser):
             ixx, iyy, izz = self._parse_vector(diaginertia, 3)
             inertia = Inertia(ixx=ixx, iyy=iyy, izz=izz, **self._get_source_metadata(inertial_elem))
         elif fullinertia := inertial_elem.get("fullinertia"):
-            ixx, ixy, ixz, iyy, iyz, izz = self._parse_vector(fullinertia, 6)
+            ixx, iyy, izz, ixy, ixz, iyz = self._parse_vector(fullinertia, 6)
             inertia = Inertia(
                 ixx=ixx, ixy=ixy, ixz=ixz, iyy=iyy, iyz=iyz, izz=izz, **self._get_source_metadata(inertial_elem)
             )
@@ -1178,7 +1178,8 @@ class MJCFParser(XMLParser):
             Material object, or None if no material defined
         """
         material_name = geom_elem.get("material")
-        if not material_name:
+        rgba_str = geom_elem.get("rgba")
+        if not material_name and not rgba_str:
             return None
 
         if material_name in self._global_materials:
@@ -1189,7 +1190,7 @@ class MJCFParser(XMLParser):
             rgba = None
             texture_filename = None
 
-        if rgba_str := geom_elem.get("rgba"):
+        if rgba_str:
             rgba = self._parse_vector(rgba_str, 4)
 
         return Material(

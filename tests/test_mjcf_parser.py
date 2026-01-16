@@ -198,6 +198,13 @@ def test_visuals(data_dir: Path) -> None:
     assert blue_body.visuals[0].material.name == "blue_material"
     assert blue_body.visuals[0].material.rgba == (0.0, 0.0, 1.0, 1.0)
 
+    red_body = robot.links["red_body"]
+    assert len(red_body.visuals) == 1
+    assert isinstance(red_body.visuals[0].geometry, Cylinder)
+    assert red_body.visuals[0].material is not None
+    assert red_body.visuals[0].material.name is None
+    assert red_body.visuals[0].material.rgba == (1.0, 0.0, 0.0, 1.0)
+
     metal_body = robot.links["metal_body"]
     assert len(metal_body.visuals) == 1
     assert metal_body.visuals[0].material is not None
