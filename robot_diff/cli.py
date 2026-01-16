@@ -10,9 +10,9 @@ from .parsers import IsaacUSDParser, MJCFParser, SDFParser, URDFParser
 
 
 class Format(Enum):
-    status = "status"
-    git = "git"
-    category = "category"
+    status = StatusFormatter
+    git = GitFormatter
+    category = CategoryFormatter
 
 
 def _get_parser(path: Path):
@@ -71,14 +71,7 @@ def main(
 
     diff = compare_robots(old_robot, new_robot, exclude, float_tol)
 
-    formatter_map = {
-        Format.status: StatusFormatter,
-        Format.git: GitFormatter,
-        Format.category: CategoryFormatter,
-    }
-    formatter = formatter_map[format](diff)
-
-    print(formatter.format())
+    print(format.value(diff).format())
 
 
 def tyro_cli():
