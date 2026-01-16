@@ -79,7 +79,8 @@ def compare_values(old: Any, new: Any, path: str = "", float_tol: float = 1e-6) 
     changes = {}
 
     if old is None or new is None:
-        changes[path] = Change(old, new)
+        if old != new:
+            changes[path] = Change(old, new)
         return changes
 
     # handle floats

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from collections import Counter
 from collections.abc import Iterable
 from dataclasses import is_dataclass
+from enum import Enum
 from itertools import chain
 from typing import Any
 
@@ -9,10 +10,24 @@ from .diff import Change, ItemDiff, RobotDiff
 
 __all__ = ["StringFormatter", "StatusFormatter", "GitFormatter", "CategoryFormatter"]
 
-# ANSI color codes
-RED = "\033[31m"
-GREEN = "\033[32m"
-RESET = "\033[0m"
+
+class Color(Enum):
+    """ANSI color codes"""
+
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    RESET = "\033[0m"
+
+    def apply(self, text: str) -> str:
+        """Apply ANSI color to text
+
+        Args:
+            text: Text to colorize
+
+        Returns:
+            Colorized string
+        """
+        return f"{self.value}{text}{Color.RESET.value}"
 
 
 class StringFormatter(ABC):
@@ -30,24 +45,12 @@ class StringFormatter(ABC):
         """Format the diff"""
         pass
 
-    def _colorize(self, text: str, color: str) -> str:
-        """Apply ANSI color to text
-
-        Args:
-            text: Text to _colorize
-            color: ANSI color code to apply
-
-        Returns:
-            Colorized string
-        """
-        return f"{color}{text}{RESET}"
-
-    def _format_value(self, value: Any, color: str = "") -> str:
+    def _format_value(self, value: Any, color: Color | None = None) -> str:
         """Format a single value for display
 
         Args:
             value: Value to format
-            color: Optional ANSI color code to apply
+            color: Optional color to apply
 
         Returns:
             Formatted string of the value
@@ -64,7 +67,7 @@ class StringFormatter(ABC):
         else:
             formatted = str(value)
 
-        return self._colorize(formatted, color) if color else formatted
+        return color.apply(formatted) if color else formatted
 
     def _format_tuple_with_diff(self, old_tuple: tuple, new_tuple: tuple) -> tuple[str, str]:
         """Format old and new tuples with colored diffs
@@ -77,7 +80,7 @@ class StringFormatter(ABC):
             Tuple of (formatted_old, formatted_new) strings
         """
         if len(old_tuple) != len(new_tuple):
-            return (self._format_value(old_tuple, RED), self._format_value(new_tuple, GREEN))
+            return (self._format_value(old_tuple, Color.RED), self._format_value(new_tuple, Color.GREEN))
 
         old_parts, new_parts = [], []
         for old_val, new_val in zip(old_tuple, new_tuple, strict=False):
@@ -85,8 +88,8 @@ class StringFormatter(ABC):
                 old_parts.append(str(old_val))
                 new_parts.append(str(new_val))
             else:
-                old_parts.append(self._colorize(str(old_val), RED))
-                new_parts.append(self._colorize(str(new_val), GREEN))
+                old_parts.append(Color.RED.apply(str(old_val)))
+                new_parts.append(Color.GREEN.apply(str(new_val)))
 
         return f"({', '.join(old_parts)})", f"({', '.join(new_parts)})"
 
@@ -109,11 +112,11 @@ class StringFormatter(ABC):
             item_diffs: Iterable of ItemDiff objects
 
         Returns:
-            Tuple of (added_count, removed_count, modified_count)
+            Tuple of (removed_count, added_count, modified_count)
         """
 
         counts = Counter(item_diff.status for item_diff in item_diffs)
-        return counts["added"], counts["removed"], counts["modified"]
+        return counts["removed"], counts["added"], counts["modified"]
 
     def _wrap_bars(self, text: str) -> str:
         """Wrap text in horiztonal bars (━)
@@ -140,7 +143,7 @@ class StatusFormatter(StringFormatter):
         lines.append(self._wrap_bars("NAME"))
         lines.append("")
         if self.diff.old_name != self.diff.new_name:
-            lines.append(f"{self._colorize(self.diff.old_name, RED)} → {self._colorize(self.diff.new_name, GREEN)}")
+            lines.append(f"{Color.RED.apply(self.diff.old_name)} → {Color.GREEN.apply(self.diff.new_name)}")
         else:
             lines.append(f"{self.diff.old_name} → {self.diff.new_name}")
         lines.append("")
@@ -152,19 +155,19 @@ class StatusFormatter(StringFormatter):
         lines.append("═" * 45)
         lines.append("")
 
-        lines.extend(self._format_simple_section("removed", "REMOVED", RED))
-        lines.extend(self._format_simple_section("added", "ADDED", GREEN))
+        lines.extend(self._format_simple_section("removed", "REMOVED", Color.RED))
+        lines.extend(self._format_simple_section("added", "ADDED", Color.GREEN))
         lines.extend(self._format_modified_section("MODIFIED"))
 
         return "\n".join(lines).rstrip()
 
-    def _format_simple_section(self, status: str, title: str, color: str) -> list[str]:
+    def _format_simple_section(self, status: str, title: str, color: Color) -> list[str]:
         """Format a simple section (added or removed items)
 
         Args:
             status: Status to filter by
             title: Section title
-            color: ANSI color code for item names
+            color: Color for item names
 
         Returns:
             List of formatted lines
@@ -178,9 +181,9 @@ class StatusFormatter(StringFormatter):
         lines = [self._wrap_bars(title), ""]
 
         for link_diff in link_diffs:
-            lines.append(f"Link: {color}{link_diff.name}{RESET}")
+            lines.append(f"Link: {color.apply(link_diff.name)}")
         for joint_diff in joint_diffs:
-            lines.append(f"Joint: {color}{joint_diff.name}{RESET}")
+            lines.append(f"Joint: {color.apply(joint_diff.name)}")
 
         lines.append("")
         return lines
@@ -220,18 +223,19 @@ class StatusFormatter(StringFormatter):
         Returns:
             Formatted string
         """
-        if change.status == "added":
-            return self._format_value("added", GREEN)
-        elif change.status == "removed":
-            return self._format_value("removed", RED)
+        old_str = self._format_value(change.old_value, Color.RED)
+        new_str = self._format_value(change.new_value, Color.GREEN)
+
+        if change.status == "removed":
+            return old_str
+        elif change.status == "added":
+            return new_str
 
         # handle tuples
         if isinstance(change.old_value, tuple) and isinstance(change.new_value, tuple):
             old_str, new_str = self._format_tuple_with_diff(change.old_value, change.new_value)
             return f"{old_str} → {new_str}"
 
-        old_str = self._format_value(change.old_value, RED)
-        new_str = self._format_value(change.new_value, GREEN)
         return f"{old_str} → {new_str}"
 
 
@@ -249,8 +253,8 @@ class GitFormatter(StringFormatter):
         lines.append("@@ Name @@")
         lines.append("")
         if self.diff.old_name != self.diff.new_name:
-            lines.append(self._colorize(f"-name: {self.diff.old_name}", RED))
-            lines.append(self._colorize(f"+name: {self.diff.new_name}", GREEN))
+            lines.append(Color.RED.apply(f"-name: {self.diff.old_name}"))
+            lines.append(Color.GREEN.apply(f"+name: {self.diff.new_name}"))
         lines.append("")
 
         link_removed_count, link_added_count, link_modified_count = self._count_itemdiffs_by_status(
@@ -287,9 +291,9 @@ class GitFormatter(StringFormatter):
         lines = []
         for item_diff in sorted(item_diffs, key=lambda x: x.name):
             if item_diff.status == "removed":
-                lines.append(self._colorize(f"-{item_type} {item_diff.name}", RED))
+                lines.append(Color.RED.apply(f"-{item_type} {item_diff.name}"))
             elif item_diff.status == "added":
-                lines.append(self._colorize(f"+{item_type} {item_diff.name}", GREEN))
+                lines.append(Color.GREEN.apply(f"+{item_type} {item_diff.name}"))
             else:
                 lines.append(f" {item_type} {item_diff.name}")
                 for path, change in sorted(item_diff.changes.items()):
@@ -311,19 +315,16 @@ class GitFormatter(StringFormatter):
 
         if change.status == "added":
             value_str = self._format_value(change.new_value)
-            return [self._colorize(f"+{indent}{path}: {value_str}", GREEN)]
+            return [Color.GREEN.apply(f"+{indent}{path}: {value_str}")]
 
         if change.status == "removed":
             value_str = self._format_value(change.old_value)
-            return [self._colorize(f"-{indent}{path}: {value_str}", RED)]
+            return [Color.RED.apply(f"-{indent}{path}: {value_str}")]
 
         old_str = self._format_value(change.old_value)
         new_str = self._format_value(change.new_value)
 
-        return [
-            self._colorize(f"-{indent}{path}: {old_str}", RED),
-            self._colorize(f"+{indent}{path}: {new_str}", GREEN),
-        ]
+        return [Color.RED.apply(f"-{indent}{path}: {old_str}"), Color.GREEN.apply(f"+{indent}{path}: {new_str}")]
 
 
 class CategoryFormatter(StringFormatter):
@@ -350,8 +351,8 @@ class CategoryFormatter(StringFormatter):
 
     def _format_name_section(self) -> list[str]:
         """Format the name section"""
-        old_name = self._colorize(self.diff.old_name, RED)
-        new_name = self._colorize(self.diff.new_name, GREEN)
+        old_name = Color.RED.apply(self.diff.old_name)
+        new_name = Color.GREEN.apply(self.diff.new_name)
         return [self._wrap_bars("NAME"), "", f"{old_name} → {new_name}", ""]
 
     # ~~ could potentially simplify by iterating over all link_diffs/joint_diffs in one loop
@@ -359,15 +360,15 @@ class CategoryFormatter(StringFormatter):
         """Format the kinematics section"""
         lines = [self._wrap_bars("KINEMATIC"), ""]
 
-        for status, color in {"removed": RED, "added": GREEN}.items():
+        for status, color in {"removed": Color.RED, "added": Color.GREEN}.items():
             link_diffs = self._filter_itemdiffs_by_status(self.diff.link_diffs.values(), status)
             joint_diffs = self._filter_itemdiffs_by_status(self.diff.joint_diffs.values(), status)
 
             if link_diffs or joint_diffs:
                 for link_diff in link_diffs:
-                    lines.append(f"Link: {self._colorize(link_diff.name, color)}")
+                    lines.append(f"Link: {color.apply(link_diff.name)}")
                 for joint_diff in joint_diffs:
-                    lines.append(f"Joint: {self._colorize(joint_diff.name, color)}")
+                    lines.append(f"Joint: {color.apply(joint_diff.name)}")
                 lines.append("")
 
         modified_joint_diffs = self._filter_itemdiffs_by_status(self.diff.joint_diffs.values(), "modified")
@@ -412,16 +413,17 @@ class CategoryFormatter(StringFormatter):
         Returns:
             Formatted string
         """
-        if change.status == "added":
-            return self._colorize("added", GREEN)
-        elif change.status == "removed":
-            return self._colorize("removed", RED)
+        old_str = self._format_value(change.old_value, Color.RED)
+        new_str = self._format_value(change.new_value, Color.GREEN)
+
+        if change.status == "removed":
+            return old_str
+        elif change.status == "added":
+            return new_str
 
         # handle tuples
         if isinstance(change.old_value, tuple) and isinstance(change.new_value, tuple):
             old_str, new_str = self._format_tuple_with_diff(change.old_value, change.new_value)
             return f"{old_str} → {new_str}"
 
-        old_str = self._format_value(change.old_value, RED)
-        new_str = self._format_value(change.new_value, GREEN)
         return f"{old_str} → {new_str}"

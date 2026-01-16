@@ -16,6 +16,7 @@ __all__ = [
     "Collision",
     "Material",
     "Visual",
+    "Limit",
 ]
 
 
@@ -225,7 +226,7 @@ class Link(Base):
         name: Name of the link
         inertial: Inertial properties, defaults to None
         collisions: List of Collision objects, defaults to empty list
-        collisions: List of Visual objects, defaults to empty list
+        visuals: List of Visual objects, defaults to empty list
     """
 
     name: str

@@ -180,3 +180,27 @@ Visit the [appendix](docs/APPENDIX.md) for a more verbose discussion on the just
 - [ ] Support arbitrary pose declaration in `SDFParser`
 
 - [ ] Add conversion between **XML formats** with `robot-diff convert` (leave USD creation to [Isaac](https://isaac-sim.github.io/IsaacLab/main/source/how-to/import_new_asset.html) and [Newton](https://github.com/newton-physics/mujoco-usd-converter) for now)
+
+## Development
+
+To manually lint/format,
+```sh
+uv run ruff check --fix .
+uv run ruff format .
+```
+Ruff is also configured as a pre-commit
+
+To run tests,
+```
+uv run pytest
+```
+
+To type check,
+```sh
+uv run ty check
+```
+
+To build a release,
+```sh
+uv build # generates wheel and source in dist/
+```

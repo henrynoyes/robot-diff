@@ -22,6 +22,10 @@
       <geom type="mesh" mesh="body" class="visual" material="blue_material"/>
     </body>
 
+    <body name="red_body">
+      <geom type="cylinder" size="0.2 0.5" class="visual" rgba="1 0 0 1"/>
+    </body>
+
     <body name="metal_body">
       <geom type="sphere" size="0.2" class="visual" material="textured_material"/>
     </body>
