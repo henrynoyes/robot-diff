@@ -7,8 +7,21 @@ from itertools import chain
 from typing import Any
 
 from .diff import Change, ItemDiff, RobotDiff
+from .model import (
+    Box,
+    Collision,
+    Cylinder,
+    Geometry,
+    Joint,
+    Link,
+    Material,
+    Mesh,
+    Robot,
+    Sphere,
+    Visual,
+)
 
-__all__ = ["StringFormatter", "StatusFormatter", "GitFormatter", "CategoryFormatter"]
+__all__ = ["StatusFormatter", "GitFormatter", "CategoryFormatter", "TreeFormatter", "DetailedFormatter"]
 
 
 class Color(Enum):
@@ -31,18 +44,14 @@ class Color(Enum):
 
 
 class StringFormatter(ABC):
-    """Base class for all string formatters
+    """Base class for all string formatters"""
 
-    Attributes:
-        diff: RobotDiff object to format
-    """
-
-    def __init__(self, diff: RobotDiff):
-        self.diff = diff
+    INDENT = "  "
+    BULLET = "• "
 
     @abstractmethod
     def format(self) -> str:
-        """Format the diff"""
+        """Format the content"""
         pass
 
     def _format_value(self, value: Any, color: Color | None = None) -> str:
@@ -68,6 +77,30 @@ class StringFormatter(ABC):
             formatted = str(value)
 
         return color.apply(formatted) if color else formatted
+
+    def _wrap_bars(self, text: str, num_bars: int = 3) -> str:
+        """Wrap text in horizontal bars (━)
+
+        Args:
+            text: Text to wrap
+            num_bars: Number of bars on each side, defaults to 3
+
+        Returns:
+            Formatted string
+        """
+        bars = "━" * num_bars
+        return f"{bars} {text} {bars}"
+
+
+class RobotDiffFormatter(StringFormatter):
+    """Base class for RobotDiff formatters
+
+    Attributes:
+        diff: RobotDiff object to format
+    """
+
+    def __init__(self, diff: RobotDiff):
+        self.diff = diff
 
     def _format_tuple_with_diff(self, old_tuple: tuple, new_tuple: tuple) -> tuple[str, str]:
         """Format old and new tuples with colored diffs
@@ -114,23 +147,11 @@ class StringFormatter(ABC):
         Returns:
             Tuple of (removed_count, added_count, modified_count)
         """
-
         counts = Counter(item_diff.status for item_diff in item_diffs)
         return counts["removed"], counts["added"], counts["modified"]
 
-    def _wrap_bars(self, text: str) -> str:
-        """Wrap text in horiztonal bars (━)
 
-        Args:
-            text: Text to wrap
-
-        Returns:
-            Formatted string
-        """
-        return f"━━━ {text} ━━━"
-
-
-class StatusFormatter(StringFormatter):
+class StatusFormatter(RobotDiffFormatter):
     """Formatter that groups item diffs by status (removed, added, and modified)"""
 
     def format(self) -> str:
@@ -139,9 +160,7 @@ class StatusFormatter(StringFormatter):
         Returns:
             Formatted string
         """
-        lines = []
-        lines.append(self._wrap_bars("NAME"))
-        lines.append("")
+        lines = [self._wrap_bars("NAME"), ""]
         if self.diff.old_name != self.diff.new_name:
             lines.append(f"{Color.RED.apply(self.diff.old_name)} → {Color.GREEN.apply(self.diff.new_name)}")
         else:
@@ -150,10 +169,14 @@ class StatusFormatter(StringFormatter):
 
         all_item_diffs = chain(self.diff.link_diffs.values(), self.diff.joint_diffs.values())
         removed_count, added_count, modified_count = self._count_itemdiffs_by_status(all_item_diffs)
-        lines.append("═" * 45)
-        lines.append(f"SUMMARY: {removed_count} removed, {added_count} added, {modified_count} modified")
-        lines.append("═" * 45)
-        lines.append("")
+        lines.extend(
+            [
+                "═" * 45,
+                f"SUMMARY: {removed_count} removed, {added_count} added, {modified_count} modified",
+                "═" * 45,
+                "",
+            ]
+        )
 
         lines.extend(self._format_simple_section("removed", "REMOVED", Color.RED))
         lines.extend(self._format_simple_section("added", "ADDED", Color.GREEN))
@@ -178,15 +201,14 @@ class StatusFormatter(StringFormatter):
         if not (link_diffs or joint_diffs):
             return []
 
-        lines = [self._wrap_bars(title), ""]
-
-        for link_diff in link_diffs:
-            lines.append(f"Link: {color.apply(link_diff.name)}")
-        for joint_diff in joint_diffs:
-            lines.append(f"Joint: {color.apply(joint_diff.name)}")
-
-        lines.append("")
-        return lines
+        return list(
+            chain(
+                [self._wrap_bars(title), ""],
+                (f"Link: {color.apply(diff.name)}" for diff in link_diffs),
+                (f"Joint: {color.apply(diff.name)}" for diff in joint_diffs),
+                [""],
+            )
+        )
 
     def _format_modified_section(self, title: str) -> list[str]:
         """Format the modified section
@@ -207,10 +229,16 @@ class StatusFormatter(StringFormatter):
 
         for item_type, item_diffs in [("Link", link_diffs), ("Joint", joint_diffs)]:
             for item_diff in item_diffs:
-                lines.append(f"{item_type}: {item_diff.name}")
-                for path, change in sorted(item_diff.changes.items()):
-                    lines.append(f"  • {path}: {self._format_change(change)}")
-                lines.append("")
+                lines.extend(
+                    chain(
+                        [f"{item_type}: {item_diff.name}"],
+                        (
+                            f"{self.INDENT}{self.BULLET}{path}: {self._format_change(change)}"
+                            for path, change in sorted(item_diff.changes.items())
+                        ),
+                        [""],
+                    )
+                )
 
         return lines
 
@@ -239,8 +267,8 @@ class StatusFormatter(StringFormatter):
         return f"{old_str} → {new_str}"
 
 
-class GitFormatter(StringFormatter):
-    """Formatter that mimics git-style diff"""
+class GitFormatter(RobotDiffFormatter):
+    """Formatter that mimics the git style"""
 
     def format(self) -> str:
         """Format the diff in git style
@@ -248,42 +276,49 @@ class GitFormatter(StringFormatter):
         Returns:
             Formatted string
         """
-        lines = []
-
-        lines.append("@@ Name @@")
-        lines.append("")
+        lines = ["@@ Name @@", ""]
         if self.diff.old_name != self.diff.new_name:
-            lines.append(Color.RED.apply(f"-name: {self.diff.old_name}"))
-            lines.append(Color.GREEN.apply(f"+name: {self.diff.new_name}"))
+            lines.extend(
+                [Color.RED.apply(f"-name: {self.diff.old_name}"), Color.GREEN.apply(f"+name: {self.diff.new_name}")]
+            )
         lines.append("")
 
         link_removed_count, link_added_count, link_modified_count = self._count_itemdiffs_by_status(
             self.diff.link_diffs.values()
         )
-        lines.append(
-            f"@@ Links ({link_removed_count} removed, {link_added_count} added, {link_modified_count} modified) @@"
+        lines.extend(
+            [
+                (
+                    f"@@ Links ({link_removed_count} removed, "
+                    f"{link_added_count} added, {link_modified_count} modified) @@"
+                ),
+                "",
+            ]
         )
-        lines.append("")
         lines.extend(self._format_itemdiffs(self.diff.link_diffs.values(), "Link"))
 
         joint_removed_count, joint_added_count, joint_modified_count = self._count_itemdiffs_by_status(
             self.diff.joint_diffs.values()
         )
-        lines.append(
-            f"@@ Joints ({joint_removed_count} removed, {joint_added_count} added, {joint_modified_count} modified) @@"
+        lines.extend(
+            [
+                (
+                    f"@@ Joints ({joint_removed_count} removed, "
+                    f"{joint_added_count} added, {joint_modified_count} modified) @@"
+                ),
+                "",
+            ]
         )
-        lines.append("")
         lines.extend(self._format_itemdiffs(self.diff.joint_diffs.values(), "Joint"))
 
         return "\n".join(lines).rstrip()
 
-    # ~~ change item_type var name?
     def _format_itemdiffs(self, item_diffs: Iterable[ItemDiff], item_type: str) -> list[str]:
         """Format item diffs in git style
 
         Args:
             item_diffs: Iterable of ItemDiff objects
-            item_type: Type label ("Link" or "Joint")
+            item_type: Type label ('Link' or 'Joint')
 
         Returns:
             List of formatted lines
@@ -311,23 +346,24 @@ class GitFormatter(StringFormatter):
         Returns:
             List of formatted lines
         """
-        indent = "  "
+        if change.status == "removed":
+            value_str = self._format_value(change.old_value)
+            return [Color.RED.apply(f"-{self.INDENT}{path}: {value_str}")]
 
         if change.status == "added":
             value_str = self._format_value(change.new_value)
-            return [Color.GREEN.apply(f"+{indent}{path}: {value_str}")]
-
-        if change.status == "removed":
-            value_str = self._format_value(change.old_value)
-            return [Color.RED.apply(f"-{indent}{path}: {value_str}")]
+            return [Color.GREEN.apply(f"+{self.INDENT}{path}: {value_str}")]
 
         old_str = self._format_value(change.old_value)
         new_str = self._format_value(change.new_value)
 
-        return [Color.RED.apply(f"-{indent}{path}: {old_str}"), Color.GREEN.apply(f"+{indent}{path}: {new_str}")]
+        return [
+            Color.RED.apply(f"-{self.INDENT}{path}: {old_str}"),
+            Color.GREEN.apply(f"+{self.INDENT}{path}: {new_str}"),
+        ]
 
 
-class CategoryFormatter(StringFormatter):
+class CategoryFormatter(RobotDiffFormatter):
     """Formatter that groups changes by category (kinematic, collision, inertia, visual)"""
 
     def format(self) -> str:
@@ -341,7 +377,6 @@ class CategoryFormatter(StringFormatter):
         if self.diff.old_name != self.diff.new_name:
             lines.extend(self._format_name_section())
 
-        # Other sections
         lines.extend(self._format_kinematics_section())
         lines.extend(self._format_category_section("collisions", "COLLISION"))
         lines.extend(self._format_category_section("inertial", "INERTIA"))
@@ -355,7 +390,6 @@ class CategoryFormatter(StringFormatter):
         new_name = Color.GREEN.apply(self.diff.new_name)
         return [self._wrap_bars("NAME"), "", f"{old_name} → {new_name}", ""]
 
-    # ~~ could potentially simplify by iterating over all link_diffs/joint_diffs in one loop
     def _format_kinematics_section(self) -> list[str]:
         """Format the kinematics section"""
         lines = [self._wrap_bars("KINEMATIC"), ""]
@@ -375,7 +409,7 @@ class CategoryFormatter(StringFormatter):
         for modified_joint_diff in modified_joint_diffs:
             lines.append(f"Joint: {modified_joint_diff.name}")
             for path, change in sorted(modified_joint_diff.changes.items()):
-                lines.append(f"  • {path}: {self._format_change(change)}")
+                lines.append(f"{self.INDENT}{self.BULLET}{path}: {self._format_change(change)}")
             lines.append("")
 
         return lines if len(lines) > 2 else []
@@ -399,7 +433,7 @@ class CategoryFormatter(StringFormatter):
             if category_changes:
                 lines.append(f"Link: {modified_link_diff.name}")
                 for path, change in sorted(category_changes.items()):
-                    lines.append(f"  • {path}: {self._format_change(change)}")
+                    lines.append(f"{self.INDENT}{self.BULLET}{path}: {self._format_change(change)}")
                 lines.append("")
 
         return lines if len(lines) > 2 else []
@@ -427,3 +461,253 @@ class CategoryFormatter(StringFormatter):
             return f"{old_str} → {new_str}"
 
         return f"{old_str} → {new_str}"
+
+
+class RobotFormatter(StringFormatter):
+    """Base class for Robot formatters
+
+    Attributes:
+        robot: Robot object to format
+    """
+
+    def __init__(self, robot: Robot):
+        self.robot = robot
+
+    def _format_header(self) -> list[str]:
+        """Format the robot header
+
+        Returns:
+            List of formatted header lines
+        """
+        return [
+            "═" * 45,
+            f"{self.robot.name}: {len(self.robot.links)} Links, {len(self.robot.joints)} Joints",
+            "═" * 45,
+        ]
+
+
+class TreeFormatter(RobotFormatter):
+    """Formatter that displays the kinematic tree structure of a robot"""
+
+    def format(self) -> str:
+        """Format the robot as a tree
+
+        Returns:
+            Formatted string
+        """
+
+        self._children = {}
+        self._joint_names = {}
+
+        for joint in self.robot.joints.values():
+            self._children.setdefault(joint.parent, []).append(joint.child)
+            self._joint_names[joint.child] = joint.name
+
+        root = next(link for link in self.robot.links if link not in self._joint_names)
+
+        return "\n".join([*self._format_header(), root, *self._format_tree(root, [])])
+
+    def _format_tree(self, parent, branch_state):
+        """Recursively yield formatted tree lines
+
+        Args:
+            parent: Parent link name
+            branch_state: List of booleans indicating if each ancestor is a last child
+
+        Yields:
+            Formatted tree lines
+        """
+        children = sorted(self._children.get(parent, []))
+
+        for i, child in enumerate(children):
+            is_last = i == len(children) - 1
+
+            # build prefix from branch state
+            prefix = "".join("    " if is_last_at_level else "│   " for is_last_at_level in branch_state)
+            connector = "└── " if is_last else "├── "
+
+            joint_name = self._joint_names.get(child)
+            node = f"[{joint_name}] {child}" if joint_name else child
+            yield f"{prefix}{connector}{node}"
+
+            # recurse with update branch state
+            yield from self._format_tree(child, [*branch_state, is_last])
+
+
+class DetailedFormatter(RobotFormatter):
+    """Formatter that displays detailed information of a robot"""
+
+    def format(self) -> str:
+        """Format the robot details
+
+        Returns:
+            Formatted string
+        """
+        lines = [*self._format_header(), "", self._wrap_bars("DETAILS"), ""]
+
+        for _, link in sorted(self.robot.links.items()):
+            lines.extend(self._format_link(link))
+
+        for _, joint in sorted(self.robot.joints.items()):
+            lines.extend(self._format_joint(joint))
+
+        return "\n".join(lines).rstrip()
+
+    def _format_link(self, link: Link) -> list[str]:
+        """Format a link
+
+        Args:
+            link: Link to format
+
+        Returns:
+            List of formatted lines
+        """
+        lines = [f"Link: {link.name}"]
+
+        if link.inertial:
+            inertia = link.inertial.inertia
+            inertia_vals = (inertia.ixx, inertia.ixy, inertia.ixz, inertia.iyy, inertia.iyz, inertia.izz)
+            lines.extend(
+                [
+                    self._wrap_bars("INERTIAL", 1),
+                    f"{self.INDENT}{self.BULLET}inertia: {inertia_vals}",
+                    f"{self.INDENT}{self.BULLET}mass: {link.inertial.mass}",
+                    f"{self.INDENT}{self.BULLET}pos: {self._format_value(link.inertial.origin.xyz)}",
+                    f"{self.INDENT}{self.BULLET}quat: {self._format_value(link.inertial.origin.quat)}",
+                ]
+            )
+
+        if link.collisions:
+            lines.append(self._wrap_bars("COLLISION", 1))
+            for collision in link.collisions:
+                lines.extend(self._format_collision(collision))
+
+        if link.visuals:
+            lines.append(self._wrap_bars("VISUAL", 1))
+            for visual in link.visuals:
+                lines.extend(self._format_visual(visual))
+
+        lines.append("")
+        return lines
+
+    def _format_collision(self, collision: Collision) -> list[str]:
+        """Format a collision
+
+        Args:
+            collision: Collision to format
+
+        Returns:
+            List of formatted lines
+        """
+        if not collision.geometry:
+            return []
+
+        geom_type = type(collision.geometry).__name__.lower()
+        return [
+            f"{self.INDENT}{geom_type}: {collision.name}",
+            *self._format_geometry(collision.geometry),
+            f"{self.INDENT * 2}{self.BULLET}pos: {self._format_value(collision.origin.xyz)}",
+            f"{self.INDENT * 2}{self.BULLET}quat: {self._format_value(collision.origin.quat)}",
+        ]
+
+    def _format_visual(self, visual: Visual) -> list[str]:
+        """Format a visual
+
+        Args:
+            visual: Visual to format
+
+        Returns:
+            List of formatted lines
+        """
+        if not visual.geometry:
+            return []
+
+        geom_type = type(visual.geometry).__name__.lower()
+        lines = [f"{self.INDENT}{geom_type}:", *self._format_geometry(visual.geometry)]
+
+        if visual.material:
+            lines.extend(self._format_material(visual.material))
+
+        lines.extend(
+            [
+                f"{self.INDENT * 2}{self.BULLET}pos: {self._format_value(visual.origin.xyz)}",
+                f"{self.INDENT * 2}{self.BULLET}quat: {self._format_value(visual.origin.quat)}",
+            ]
+        )
+
+        return lines
+
+    def _format_material(self, material: Material) -> list[str]:
+        """Format material properties
+
+        Args:
+            material: Material object
+
+        Returns:
+            List of formatted lines
+        """
+        lines = []
+        if material.name:
+            lines.append(f"{self.INDENT * 2}{self.BULLET}material_name: {material.name}")
+        if material.rgba:
+            lines.append(f"{self.INDENT * 2}{self.BULLET}rgba: {self._format_value(material.rgba)}")
+        if material.texture_filename:
+            lines.append(f"{self.INDENT * 2}{self.BULLET}texture_filename: {material.texture_filename}")
+        return lines
+
+    def _format_geometry(self, geometry: Geometry) -> list[str]:  # ty: ignore[invalid-return-type]
+        """Format geometry properties
+
+        Args:
+            geometry: Geometry object
+
+        Returns:
+            List of formatted lines
+        """
+        match geometry:
+            case Box():
+                return [f"{self.INDENT * 2}{self.BULLET}size: {self._format_value(geometry.size)}"]
+            case Cylinder():
+                return [
+                    f"{self.INDENT * 2}{self.BULLET}radius: {geometry.radius}",
+                    f"{self.INDENT * 2}{self.BULLET}length: {geometry.length}",
+                ]
+            case Sphere():
+                return [f"{self.INDENT * 2}{self.BULLET}radius: {geometry.radius}"]
+            case Mesh():
+                return [
+                    f"{self.INDENT * 2}{self.BULLET}filename: {geometry.filename}",
+                    f"{self.INDENT * 2}{self.BULLET}scale: {self._format_value(geometry.scale)}",
+                ]
+
+    def _format_joint(self, joint: Joint) -> list[str]:
+        """Format a joint
+
+        Args:
+            joint: Joint to format
+
+        Returns:
+            List of formatted lines
+        """
+        lines = [
+            f"Joint: {joint.name}",
+            f"{self.INDENT}{self.BULLET}type: {joint.type}",
+            f"{self.INDENT}{self.BULLET}parent: {joint.parent}",
+            f"{self.INDENT}{self.BULLET}child: {joint.child}",
+            f"{self.INDENT}{self.BULLET}pos: {self._format_value(joint.origin.xyz)}",
+            f"{self.INDENT}{self.BULLET}quat: {self._format_value(joint.origin.quat)}",
+            f"{self.INDENT}{self.BULLET}axis: {self._format_value(joint.axis)}",
+        ]
+
+        if joint.limit:
+            lines.extend(
+                [
+                    f"{self.INDENT}{self.BULLET}lower: {joint.limit.lower}",
+                    f"{self.INDENT}{self.BULLET}upper: {joint.limit.upper}",
+                    f"{self.INDENT}{self.BULLET}effort: {joint.limit.effort}",
+                    f"{self.INDENT}{self.BULLET}velocity: {joint.limit.velocity}",
+                ]
+            )
+
+        lines.append("")
+        return lines

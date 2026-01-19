@@ -145,7 +145,7 @@ def _filter_diff_by_categories(diff: RobotDiff, excluded_categories: set[Categor
     """Filter a robot diff by excluded categories
 
     Args:
-        diff: Original RobotDiff
+        diff: Original robot diff
         excluded_categories: Set of categories to exclude ('kinematic', 'inertial', 'collision', 'visual')
 
     Returns:
@@ -180,8 +180,8 @@ def compare_robots(
     """Compare two robots and return a desired diff
 
     Args:
-        old_robot: The original robot
-        new_robot: The updated robot
+        old_robot: Original robot
+        new_robot: Updated robot
         excluded_categories: Set of categories to exclude ('kinematic', 'inertial', 'collision', 'visual')
         float_tol: Relative tolerance for float comparison, defaults to 1e-6
 
