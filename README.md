@@ -20,40 +20,62 @@ uv sync --dev
 
 ## Usage
 
-```sh
-robot-diff robot.urdf robot.xml
-```
-
 ![help](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/help.png)
 
-### Categories
+### `diff`
+
+```sh
+robot-diff diff robot.urdf robot.xml
+```
+
+![diff help](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/diff-help.png)
+
+#### Categories
 
 The diff information is divided into four categories: `kinematic`, `inertial`, `collision`, and `visual`. The CLI supports adjusting the displayed categories on an exclusion-first basis, e.g.,
 ```sh
-robot-diff robot.urdf robot.xml --exclude visual collision
+robot-diff diff robot.urdf robot.xml --exclude visual collision
 ```
 
 In the case where two robot models intentionally reference different visual meshes (e.g., `.dae` in URDF and `.obj` in MJCF), suppressing the visual diffs can help isolate the relevant information in the output.
 
-### Formats
+#### Formats
 
 `robot-diff` supports three different formats out of the box and contains an extensible interface to define custom formatters. At runtime, the information about the diff between two robot models is parsed into a `RobotDiff` object, which can then be digested and printed by various formatters. The desired format can be specified in the CLI by,
 ```sh
-robot-diff robot.urdf robot.xml --format {format}
+robot-diff diff robot.urdf robot.xml --format {format}
 ```
 
 The default formats are shown below,
 
 `status`
-![status format](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/status-format.png)
+![status diff format](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/status-diff-format.png)
 
 `category`
-![category format](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/category-format.png)
+![category diff format](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/category-diff-format.png)
 
 `git`
-![git format](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/git-format.png)
+![git diff format](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/git-diff-format.png)
 
 A custom formatter can be constructed by defining a class that takes in a `RobotDiff` object and implements a `format()` method. Optionally, this can inherit from the base `StringFormatter` class which contains helpers for parsing values and formatting strings.
+
+### `print`
+
+```sh
+robot-diff print robot.urdf
+```
+
+![print help](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/print-help.png)
+
+#### Formats
+
+A single robot model file can be printed in two different formats. This can be useful for debugging which information was parsed into the internal `Robot` representation.
+
+`tree`
+![tree print format](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/tree-print-format.png)
+
+`detailed`
+![detailed print format](https://raw.githubusercontent.com/henrynoyes/robot-diff/refs/heads/master/docs/imgs/detailed-print-format.png)
 
 ## Conventions
 

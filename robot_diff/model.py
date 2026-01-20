@@ -4,19 +4,19 @@ __all__ = [
     "Robot",
     "Link",
     "Joint",
+    "Limit",
+    "Visual",
+    "Material",
+    "Collision",
+    "Mesh",
+    "Sphere",
+    "Cylinder",
+    "Box",
+    "Geometry",
+    "Inertial",
+    "Inertia",
     "Pose",
     "Base",
-    "Geometry",
-    "Box",
-    "Cylinder",
-    "Sphere",
-    "Mesh",
-    "Inertia",
-    "Inertial",
-    "Collision",
-    "Material",
-    "Visual",
-    "Limit",
 ]
 
 
@@ -46,6 +46,37 @@ class Pose(Base):
 
     xyz: tuple[float, float, float] = (0.0, 0.0, 0.0)
     quat: tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0)
+
+
+@dataclass
+class Inertia(Base):
+    """Inertia tensor
+
+    Attributes:
+        ixx, ixy, ixz, iyy, iyz, izz: Components of the 3x3 symmetric inertia tensor in kg*m^2
+    """
+
+    ixx: float = 0.0
+    ixy: float = 0.0
+    ixz: float = 0.0
+    iyy: float = 0.0
+    iyz: float = 0.0
+    izz: float = 0.0
+
+
+@dataclass
+class Inertial(Base):
+    """Inertial properties of a link
+
+    Attributes:
+        origin: Pose of inertial frame w.r.t. link frame, defaults to the identity
+        mass: Mass in kilograms
+        inertia: Inertia tensor
+    """
+
+    origin: Pose = field(default_factory=Pose)
+    mass: float = 0.0
+    inertia: Inertia = field(default_factory=Inertia)
 
 
 @dataclass
@@ -95,8 +126,8 @@ class Mesh(Geometry):
     """Mesh geometry
 
     Attributes:
-        filename: URI to mesh file
-        scale: (x, y, z) scale factors, defaults to (1.0, 1.0, 1.0)
+        filename: Path to mesh file
+        scale: (x, y, z) scaling factors, defaults to (1.0, 1.0, 1.0)
     """
 
     filename: str = ""
@@ -104,42 +135,11 @@ class Mesh(Geometry):
 
 
 @dataclass
-class Inertia(Base):
-    """Inertia tensor
-
-    Attributes:
-        ixx, ixy, ixz, iyy, iyz, izz: Components of the 3x3 symmetric inertia tensor in kg*m^2
-    """
-
-    ixx: float = 0.0
-    ixy: float = 0.0
-    ixz: float = 0.0
-    iyy: float = 0.0
-    iyz: float = 0.0
-    izz: float = 0.0
-
-
-@dataclass
-class Inertial(Base):
-    """Inertial properties of a link
-
-    Attributes:
-        origin: Pose of inertial frame w.r.t. link frame, defaults to the identity
-        mass: Mass in kilograms
-        inertia: Inertia tensor
-    """
-
-    origin: Pose = field(default_factory=Pose)
-    mass: float = 0.0
-    inertia: Inertia = field(default_factory=Inertia)
-
-
-@dataclass
 class Collision(Base):
     """Collision geometry of a link
 
     Attributes:
-        name: Optional name of the collision element
+        name: Name of the collision element, defaults to None if not specified
         origin: Pose of collision geometry w.r.t. link frame, defaults to the identity
         geometry: Geometric shape for collision checking
     """
@@ -151,12 +151,12 @@ class Collision(Base):
 
 @dataclass
 class Material(Base):
-    """Material properties for visual elements
+    """Material properties of a visual element
 
     Attributes:
         name: Name of the material, defaults to None if not specified
-        rgba: (r, g, b, a) color values from 0-1, defaults to None if not specified
-        texture_filename: URI to texture file, defaults to None if not specified
+        rgba: (r, g, b, a) color values from 0-1
+        texture_filename: Path to texture file
     """
 
     name: str | None = None
@@ -171,7 +171,7 @@ class Visual(Base):
     Attributes:
         origin: Pose of visual geometry w.r.t. link frame, defaults to the identity
         geometry: Geometric shape for visualization
-        material: Material properties, defaults to None if not specified
+        material: Material properties
     """
 
     origin: Pose = field(default_factory=Pose)
@@ -202,7 +202,7 @@ class Joint(Base):
 
     Attributes:
         name: Name of the joint
-        type: Type of joint (revolute, prismatic, fixed, continuous, floating, planar)
+        type: Type of joint (e.g. 'revolute')
         parent: Name of the parent link
         child: Name of the child link
         origin: Pose of child link frame w.r.t. parent link frame, defaults to the identity
@@ -224,9 +224,9 @@ class Link(Base):
 
     Attributes:
         name: Name of the link
-        inertial: Inertial properties, defaults to None
-        collisions: List of Collision objects, defaults to empty list
-        visuals: List of Visual objects, defaults to empty list
+        inertial: Inertial properties
+        collisions: List of Collision objects
+        visuals: List of Visual objects
     """
 
     name: str
@@ -241,8 +241,8 @@ class Robot:
 
     Attributes:
         name: Name of the robot
-        links: Dict mapping link names to Link objects, defaults to empty dict
-        joints: Dict mapping joint names to Joint objects, defaults to empty dict
+        links: Dict mapping link names to Link objects
+        joints: Dict mapping joint names to Joint objects
     """
 
     name: str
